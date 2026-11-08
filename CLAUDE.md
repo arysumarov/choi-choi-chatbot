@@ -35,8 +35,9 @@ Made from KFBG website pages (checked 8 Nov 2026):
 - `04_about_kfbg.md` – about KFBG
 - `05_kfbg_upcoming_events.md` – events from Nov 2026 (note: KFBG Countryside Eco-festival is 21–22 Nov 2026, the same weekend as our showcase)
 - `06_kfbg_farming_courses_and_shop.md` – courses, fun facts (HK tea, coffee, honey), souvenirs
+- `07_fieldwork_interviews.md` – team interviews of 21 Sep 2026: Andrew (Pig Kun Farm), Rose (Blue Girl), a Kam Tin farming couple, 2 anonymous customers; farmers' seasonal guide and reasons organic costs more. Customers' health claims deliberately left out.
 
-**Still missing** (must come from the team's fieldwork and farmer interviews): vegetable files with 2 stories plus fun facts each, recipes, a seasonal calendar, stall locations, and farmers' own stories and quotes.
+**Still missing:** stall locations, stories from the other 6 farms, the Kam Tin couple's farm name, recipes from farmers.
 
 ## Next steps
 1. Build `index.html` and `api/chat.js`, test locally with `vercel dev`.
