@@ -1,0 +1,6 @@
+{
+  "name": "choi-choi-chatbot",
+  "private": true,
+  "scripts": { "dev": "node dev-server.js" },
+  "engines": { "node": ">=18" }
+}

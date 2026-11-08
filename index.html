@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5f9e3a">
+<title>Choi Choi 菜菜</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥬</text></svg>">
+<style>
+  :root {
+    --green: #5f9e3a;
+    --green-dark: #3f7322;
+    --leaf: #a8d672;
+    --cream: #fbf8ee;
+    --ink: #2b3a1f;
+    --muted: #6b7a5e;
+    --bubble-bot: #ffffff;
+    --bubble-me: #dff0c8;
+    --line: #e4e9d8;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang HK", "Noto Sans HK", "Microsoft JhengHei", sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+  }
+  .app {
+    width: 100%;
+    max-width: 560px;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: var(--cream);
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+    background: var(--green);
+    color: #fff;
+  }
+  header .avatar { width: 46px; height: 46px; flex: none; }
+  header h1 { font-size: 18px; margin: 0; line-height: 1.2; }
+  header p { margin: 0; font-size: 12px; opacity: .9; }
+  header .titles { flex: 1; min-width: 0; }
+  .lang {
+    display: flex;
+    border: 1.5px solid rgba(255,255,255,.8);
+    border-radius: 999px;
+    overflow: hidden;
+    flex: none;
+  }
+  .lang button {
+    border: 0; background: transparent; color: #fff;
+    font: inherit; font-size: 13px; font-weight: 600;
+    padding: 6px 11px; cursor: pointer;
+  }
+  .lang button[aria-pressed="true"] { background: #fff; color: var(--green-dark); }
+
+  /* Chat */
+  #chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .row { display: flex; gap: 8px; align-items: flex-end; }
+  .row.me { justify-content: flex-end; }
+  .row .mini { width: 30px; height: 30px; flex: none; }
+  .bubble {
+    max-width: 80%;
+    padding: 10px 13px;
+    border-radius: 18px;
+    line-height: 1.45;
+    font-size: 15.5px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  .bot .bubble { background: var(--bubble-bot); border: 1px solid var(--line); border-bottom-left-radius: 6px; }
+  .me .bubble { background: var(--bubble-me); border-bottom-right-radius: 6px; }
+  .bubble.error { background: #fff4e5; border-color: #f3d5a8; }
+  .typing span {
+    display: inline-block; width: 7px; height: 7px; margin: 0 2px;
+    background: var(--green); border-radius: 50%;
+    animation: bounce 1.2s infinite ease-in-out;
+  }
+  .typing span:nth-child(2) { animation-delay: .15s; }
+  .typing span:nth-child(3) { animation-delay: .3s; }
+  @keyframes bounce { 0%, 80%, 100% { transform: translateY(0); opacity: .5; } 40% { transform: translateY(-5px); opacity: 1; } }
+
+  /* Hero (first screen) */
+  .hero { text-align: center; padding: 8px 0 4px; }
+  .hero .big { width: 120px; height: 120px; animation: wiggle 3s ease-in-out infinite; }
+  @keyframes wiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+
+  /* Quick replies */
+  #quick {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 16px 8px;
+    scrollbar-width: none;
+  }
+  #quick::-webkit-scrollbar { display: none; }
+  #quick button {
+    flex: none;
+    border: 1.5px solid var(--green);
+    background: #fff;
+    color: var(--green-dark);
+    border-radius: 999px;
+    padding: 7px 13px;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  #quick button:active { background: var(--bubble-me); }
+
+  /* Input bar */
+  form {
+    display: flex;
+    gap: 8px;
+    padding: 8px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--line);
+    background: #fff;
+  }
+  #input {
+    flex: 1;
+    min-width: 0;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    padding: 10px 15px;
+    font: inherit;
+    font-size: 16px; /* 16px stops iOS zooming in */
+    outline: none;
+  }
+  #input:focus { border-color: var(--green); }
+  .icon-btn {
+    flex: none;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 0;
+    display: grid; place-items: center;
+    cursor: pointer;
+    font-size: 20px;
+  }
+  #mic { background: #eef5e4; color: var(--green-dark); }
+  #mic.listening { background: #e5533d; color: #fff; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(229,83,61,.5); } 50% { box-shadow: 0 0 0 8px rgba(229,83,61,0); } }
+  #send { background: var(--green); color: #fff; }
+  #send:disabled { opacity: .5; cursor: default; }
+  .note { text-align: center; font-size: 11.5px; color: var(--muted); padding: 0 16px 6px; background: #fff; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <svg class="avatar" viewBox="0 0 100 100" aria-hidden="true"><use href="#cabbage"/></svg>
+    <div class="titles">
+      <h1>Choi Choi 菜菜</h1>
+      <p data-i18n="subtitle"></p>
+    </div>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="en">EN</button>
+      <button type="button" data-lang="yue">粵</button>
+    </div>
+  </header>
+
+  <main id="chat" aria-live="polite"></main>
+
+  <div id="quick"></div>
+
+  <form id="form" autocomplete="off">
+    <button type="button" id="mic" class="icon-btn" aria-label="Voice input" hidden>🎤</button>
+    <input id="input" type="text" maxlength="500" enterkeyhint="send">
+    <button type="submit" id="send" class="icon-btn" aria-label="Send">➤</button>
+  </form>
+  <div class="note" data-i18n="note"></div>
+</div>
+
+<!-- Choi Choi character (reused via <use>) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="cabbage" viewBox="0 0 100 100">
+      <ellipse cx="50" cy="93" rx="28" ry="4" fill="#000" opacity=".08"/>
+      <path d="M50 8 C22 8 8 30 10 55 C12 80 30 92 50 92 C70 92 88 80 90 55 C92 30 78 8 50 8Z" fill="#8cc75a"/>
+      <path d="M14 46 C10 26 30 10 46 16 C34 24 26 36 26 52Z" fill="#6fae3e"/>
+      <path d="M86 46 C90 26 70 10 54 16 C66 24 74 36 74 52Z" fill="#6fae3e"/>
+      <path d="M50 22 C34 22 24 38 25 56 C26 76 38 86 50 86 C62 86 74 76 75 56 C76 38 66 22 50 22Z" fill="#c4e89a"/>
+      <path d="M50 22 L50 40 M50 40 L42 32 M50 40 L58 32" stroke="#9fd06c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="40" cy="56" r="4.2" fill="#2b3a1f"/>
+      <circle cx="60" cy="56" r="4.2" fill="#2b3a1f"/>
+      <circle cx="41.4" cy="54.6" r="1.4" fill="#fff"/>
+      <circle cx="61.4" cy="54.6" r="1.4" fill="#fff"/>
+      <ellipse cx="33" cy="65" rx="5" ry="3" fill="#f5a3a3" opacity=".8"/>
+      <ellipse cx="67" cy="65" rx="5" ry="3" fill="#f5a3a3" opacity=".8"/>
+      <path d="M44 66 Q50 72 56 66" stroke="#2b3a1f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<script>
+(() => {
+  const T = {
+    en: {
+      subtitle: "Your cabbage friend at the Central Farmers' Market",
+      placeholder: "Ask Choi Choi anything…",
+      note: "Choi Choi is a cabbage, not an expert 🥬 Please don't share personal details.",
+      hello: "Hi! I'm Choi Choi 菜菜, a little cabbage from a Hong Kong organic farm 🥬\nAsk me about the market, the farmers, or local farming. You can type or tap 🎤 to talk!",
+      quick: ["What's in season?", "Meet the farmers", "Why is organic more expensive?", "When is the market open?", "What's HKORC certified?", "KFBG events"],
+      error: "Oops, my leaves got tangled 🥬 Please try again in a moment!",
+      noMic: "Sorry, voice input doesn't work in this browser. Please type instead!",
+      mic: "en-US",
+    },
+    yue: {
+      subtitle: "中環農墟嘅椰菜朋友",
+      placeholder: "問吓菜菜啦…",
+      note: "菜菜係一棵椰菜，唔係專家 🥬 請唔好分享個人資料。",
+      hello: "你好！我係菜菜，一棵嚟自香港有機農場嘅小椰菜 🥬\n你可以問我關於農墟、農夫或者本地耕種嘅嘢。打字或者撳 🎤 講嘢都得！",
+      quick: ["而家有咩時令菜？", "認識吓啲農夫", "點解有機菜貴啲？", "農墟幾點開？", "咩係 HKORC 認證？", "嘉道理有咩活動？"],
+      error: "哎呀，我啲葉打晒結 🥬 請遲啲再試吓！",
+      noMic: "唔好意思，呢個瀏覽器用唔到語音輸入，請打字啦！",
+      mic: "zh-HK",
+    },
+  };
+
+  const $ = (s) => document.querySelector(s);
+  const chat = $("#chat"), input = $("#input"), form = $("#form"),
+        sendBtn = $("#send"), micBtn = $("#mic"), quick = $("#quick");
+
+  let lang = "en";
+  try { lang = localStorage.getItem("cc-lang") || (/^zh/i.test(navigator.language) ? "yue" : "en"); } catch {}
+  const history = []; // {role, content} – kept only in this tab, never stored
+  let busy = false;
+
+  function applyLang() {
+    const t = T[lang];
+    document.documentElement.lang = lang === "yue" ? "zh-HK" : "en";
+    document.querySelectorAll("[data-i18n]").forEach((el) => (el.textContent = t[el.dataset.i18n]));
+    document.querySelectorAll(".lang button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === lang));
+    input.placeholder = t.placeholder;
+    quick.innerHTML = "";
+    t.quick.forEach((q) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = q;
+      b.onclick = () => ask(q);
+      quick.appendChild(b);
+    });
+    if (recog) recog.lang = t.mic;
+  }
+
+  function mini() {
+    const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    s.setAttribute("viewBox", "0 0 100 100");
+    s.classList.add("mini");
+    s.innerHTML = '<use href="#cabbage"/>';
+    return s;
+  }
+
+  function addMsg(role, text, cls) {
+    const row = document.createElement("div");
+    row.className = "row " + (role === "user" ? "me" : "bot");
+    if (role !== "user") row.appendChild(mini());
+    const b = document.createElement("div");
+    b.className = "bubble" + (cls ? " " + cls : "");
+    if (cls === "typing") b.innerHTML = "<span></span><span></span><span></span>";
+    else b.textContent = text;
+    row.appendChild(b);
+    chat.appendChild(row);
+    chat.scrollTop = chat.scrollHeight;
+    return row;
+  }
+
+  function showHello() {
+    chat.innerHTML = '<div class="hero"><svg class="big" viewBox="0 0 100 100" aria-hidden="true"><use href="#cabbage"/></svg></div>';
+    addMsg("assistant", T[lang].hello);
+  }
+
+  async function ask(text) {
+    text = text.trim();
+    if (!text || busy) return;
+    busy = true;
+    sendBtn.disabled = true;
+    input.value = "";
+    addMsg("user", text);
+    history.push({ role: "user", content: text });
+    const typing = addMsg("assistant", "", "typing");
+
+    try {
+      const r = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history.slice(-12) }),
+      });
+      const data = await r.json().catch(() => ({}));
+      typing.remove();
+      if (!r.ok || !data.reply) throw new Error(data.error || r.status);
+      history.push({ role: "assistant", content: data.reply });
+      addMsg("assistant", data.reply);
+    } catch (e) {
+      typing.remove();
+      history.pop(); // let the user retry the same question
+      addMsg("assistant", T[lang].error, "error");
+    } finally {
+      busy = false;
+      sendBtn.disabled = false;
+    }
+  }
+
+  form.addEventListener("submit", (e) => { e.preventDefault(); ask(input.value); });
+
+  document.querySelectorAll(".lang button").forEach((b) =>
+    b.addEventListener("click", () => {
+      lang = b.dataset.lang;
+      try { localStorage.setItem("cc-lang", lang); } catch {}
+      const fresh = history.length === 0;
+      applyLang();
+      if (fresh) showHello();
+    })
+  );
+
+  // Voice input (Web Speech API). Works in Chrome, Edge and iOS/macOS Safari.
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recog = null, listening = false;
+  if (SR) {
+    recog = new SR();
+    recog.interimResults = true;
+    recog.continuous = false;
+    recog.maxAlternatives = 1;
+    micBtn.hidden = false;
+    recog.onresult = (e) => {
+      let txt = "";
+      for (const r of e.results) txt += r[0].transcript;
+      input.value = txt;
+      if (e.results[e.results.length - 1].isFinal) {
+        recog.stop();
+        ask(txt);
+      }
+    };
+    recog.onend = () => { listening = false; micBtn.classList.remove("listening"); };
+    recog.onerror = (e) => {
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") addMsg("assistant", T[lang].noMic, "error");
+    };
+    micBtn.addEventListener("click", () => {
+      if (listening) { recog.stop(); return; }
+      recog.lang = T[lang].mic;
+      try {
+        recog.start();
+        listening = true;
+        micBtn.classList.add("listening");
+      } catch {}
+    });
+  }
+
+  applyLang();
+  showHello();
+})();
+</script>
+</body>
+</html>
