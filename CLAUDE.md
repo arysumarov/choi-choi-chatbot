@@ -11,7 +11,7 @@
 We decided to vibe-code the chatbot instead of using a no-code platform (Dify's free plan has only 200 message credits).
 
 Planned architecture:
-1. **Frontend:** a single static `index.html` with a chat UI, the Choi Choi character, quick-reply buttons ("What's in season?", "Meet the farmers", "Why is organic more expensive?"), and voice input via the browser Web Speech API (`zh-HK` for Cantonese, `en-US` for English).
+1. **Frontend:** `index.html` is the bilingual landing page (market, farmers' stories, why organic costs more, seasons, about the project); `chat.html` (served at `/chat` via Vercel `cleanUrls`) is the chat UI, the Choi Choi character, quick-reply buttons ("What's in season?", "Meet the farmers", "Why is organic more expensive?"), and voice input via the browser Web Speech API (`zh-HK` for Cantonese, `en-US` for English).
 2. **Backend:** one serverless function (`api/chat.js` on Vercel) that adds the system prompt, sends the conversation to the model, and returns the reply. The API key lives only in the environment variable `DEEPSEEK_API_KEY` and never goes in the frontend.
 3. **Model:** DeepSeek API (works from Hong Kong; OpenAI and Gemini officially block HK). Optional photo input would need a vision model such as Qwen; this is a nice-to-have, not core.
 4. **Knowledge:** the knowledge base is small (~16 KB), so no RAG is needed. Load every `kb/*.md` file into the system prompt.

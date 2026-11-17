@@ -38,9 +38,12 @@ http
       });
       return;
     }
-    if (req.url === "/" || req.url.startsWith("/index.html") || req.url.startsWith("/?")) {
+    // Same as Vercel "cleanUrls": / → index.html, /chat → chat.html
+    const page = req.url.split(/[?#]/)[0].replace(/\.html$/, "").replace(/\/$/, "") || "/index";
+    const file = path.join(__dirname, path.basename(page) + ".html");
+    if (fs.existsSync(file)) {
       res.setHeader("Content-Type", "text/html; charset=utf-8");
-      return fs.createReadStream(path.join(__dirname, "index.html")).pipe(res);
+      return fs.createReadStream(file).pipe(res);
     }
     res.statusCode = 404;
     res.end("Not found");

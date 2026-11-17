@@ -1,4 +1,5 @@
 {
+  "cleanUrls": true,
   "functions": {
     "api/chat.js": { "includeFiles": "kb/**", "maxDuration": 30 }
   }

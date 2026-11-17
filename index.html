@@ -1,193 +1,166 @@
 <!doctype html>
-<html lang="en" translate="no" class="notranslate">
+<html lang="en" translate="no" class="notranslate lang-en">
 <head>
 <meta charset="utf-8">
 <meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#5f9e3a">
-<title>Choi Choi 菜菜</title>
+<meta name="description" content="Choi Choi 菜菜 – a little Hong Kong cabbage who helps you meet the local organic farmers at the Central Farmers' Market.">
+<title>Choi Choi 菜菜 · Central Farmers' Market</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥬</text></svg>">
 <style>
   :root {
     --green: #5f9e3a;
     --green-dark: #3f7322;
-    --leaf: #a8d672;
+    --green-soft: #dff0c8;
     --cream: #fbf8ee;
+    --paper: #ffffff;
     --ink: #2b3a1f;
-    --muted: #6b7a5e;
-    --bubble-bot: #ffffff;
-    --bubble-me: #dff0c8;
+    --muted: #66745a;
     --line: #e4e9d8;
+    --sun: #f6c453;
+    --radius: 20px;
   }
   * { box-sizing: border-box; }
-  html, body { height: 100%; margin: 0; }
+  html { scroll-behavior: smooth; }
   body {
+    margin: 0;
+    overflow-x: hidden;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang HK", "Noto Sans HK", "Microsoft JhengHei", sans-serif;
     background: var(--cream);
     color: var(--ink);
-    display: flex;
-    justify-content: center;
+    line-height: 1.6;
+    font-size: 16px;
   }
-  .app {
-    width: 100%;
-    max-width: 560px;
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    background: var(--cream);
-  }
+  /* Language switching: show only the active language */
+  html.lang-en [lang="yue"], html.lang-yue [lang="en"]:not(html) { display: none !important; }
 
-  /* Header */
-  header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
-    background: var(--green);
-    color: #fff;
-  }
-  header .avatar { width: 46px; height: 46px; flex: none; }
-  header h1 { font-size: 18px; margin: 0; line-height: 1.2; }
-  header p { margin: 0; font-size: 12px; opacity: .9; }
-  header .titles { flex: 1; min-width: 0; }
-  .lang {
-    display: flex;
-    border: 1.5px solid rgba(255,255,255,.8);
-    border-radius: 999px;
-    overflow: hidden;
-    flex: none;
-  }
-  .lang button {
-    border: 0; background: transparent; color: #fff;
-    font: inherit; font-size: 13px; font-weight: 600;
-    padding: 6px 11px; cursor: pointer;
-  }
-  .lang button[aria-pressed="true"] { background: #fff; color: var(--green-dark); }
+  a { color: var(--green-dark); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-inline: 20px; }
+  section { padding-block: 64px; }
+  h1, h2, h3 { line-height: 1.2; margin: 0 0 12px; }
+  h2 { font-size: clamp(26px, 4vw, 34px); }
+  h3 { font-size: 19px; }
+  p { margin: 0 0 12px; }
+  .kicker { color: var(--green-dark); font-weight: 700; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px; }
+  .lead { font-size: 18px; color: var(--muted); max-width: 640px; }
 
-  /* Chat */
-  #chat {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  /* Nav */
+  nav {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+    background: rgba(251, 248, 238, .92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
   }
-  .row { display: flex; gap: 8px; align-items: flex-end; }
-  .row.me { justify-content: flex-end; }
-  .row .mini { width: 30px; height: 30px; flex: none; }
+  nav .wrap { display: flex; align-items: center; gap: 16px; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; text-decoration: none; color: var(--ink); font-size: 18px; }
+  .brand svg { width: 34px; height: 34px; }
+  .links { display: flex; gap: 18px; margin-left: auto; }
+  .links a { text-decoration: none; color: var(--ink); font-size: 15px; }
+  .links a:hover { color: var(--green-dark); }
+  .lang { display: flex; border: 1.5px solid var(--green); border-radius: 999px; overflow: hidden; flex: none; }
+  .lang button { border: 0; background: transparent; color: var(--green-dark); font: inherit; font-size: 13px; font-weight: 700; padding: 5px 11px; cursor: pointer; }
+  .lang button[aria-pressed="true"] { background: var(--green); color: #fff; }
+  @media (max-width: 760px) { .links { display: none; } .lang { margin-left: auto; } }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--green); color: #fff; text-decoration: none;
+    padding: 14px 24px; border-radius: 999px; font-weight: 700; font-size: 17px;
+    box-shadow: 0 6px 18px rgba(63, 115, 34, .25);
+    transition: transform .15s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.ghost { background: transparent; color: var(--green-dark); box-shadow: none; border: 2px solid var(--green); }
+
+  /* Hero */
+  .hero { padding-block: 56px 72px; }
+  .hero .wrap { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; }
+  .hero h1 { font-size: clamp(34px, 6vw, 56px); margin-bottom: 16px; }
+  .hero h1 .zh { color: var(--green); }
+  .hero .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+  .hero .when { margin-top: 22px; font-size: 15px; color: var(--muted); display: flex; gap: 8px 18px; flex-wrap: wrap; }
+  .hero .when b { color: var(--ink); }
+  .mascot { position: relative; text-align: center; }
+  .mascot svg { width: min(340px, 80%); height: auto; animation: wiggle 3.5s ease-in-out infinite; }
   .bubble {
-    max-width: 80%;
-    padding: 10px 13px;
-    border-radius: 18px;
-    line-height: 1.45;
-    font-size: 15.5px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
+    position: absolute; top: 2%; left: 0; z-index: 1;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 18px 18px 18px 4px;
+    padding: 10px 14px; font-size: 15px; box-shadow: 0 6px 18px rgba(0,0,0,.06); max-width: 220px; text-align: left;
   }
-  .bot .bubble { background: var(--bubble-bot); border: 1px solid var(--line); border-bottom-left-radius: 6px; }
-  .me .bubble { background: var(--bubble-me); border-bottom-right-radius: 6px; }
-  .bubble.error { background: #fff4e5; border-color: #f3d5a8; }
-  .typing span {
-    display: inline-block; width: 7px; height: 7px; margin: 0 2px;
-    background: var(--green); border-radius: 50%;
-    animation: bounce 1.2s infinite ease-in-out;
-  }
-  .typing span:nth-child(2) { animation-delay: .15s; }
-  .typing span:nth-child(3) { animation-delay: .3s; }
-  @keyframes bounce { 0%, 80%, 100% { transform: translateY(0); opacity: .5; } 40% { transform: translateY(-5px); opacity: 1; } }
-
-  /* Hero (first screen) */
-  .hero { text-align: center; padding: 8px 0 4px; }
-  .hero .big { width: 120px; height: 120px; animation: wiggle 3s ease-in-out infinite; }
   @keyframes wiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+  @media (max-width: 760px) {
+    .hero .wrap { grid-template-columns: minmax(0, 1fr); text-align: center; }
+    .hero .cta, .hero .when { justify-content: center; }
+    .mascot { order: -1; }
+    .mascot svg { width: 200px; }
+    .bubble { position: static; display: inline-block; margin-bottom: 8px; }
+  }
 
-  /* Quick replies */
-  #quick {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding: 4px 16px 8px;
-    scrollbar-width: none;
-  }
-  #quick::-webkit-scrollbar { display: none; }
-  #quick button {
-    flex: none;
-    border: 1.5px solid var(--green);
-    background: #fff;
-    color: var(--green-dark);
-    border-radius: 999px;
-    padding: 7px 13px;
-    font: inherit;
-    font-size: 14px;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  #quick button:active { background: var(--bubble-me); }
+  /* Cards */
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+  .card .emoji { font-size: 30px; line-height: 1; margin-bottom: 10px; }
+  .alt { background: var(--paper); border-block: 1px solid var(--line); }
+  .alt .card { background: var(--cream); }
 
-  /* Input bar */
-  form {
-    display: flex;
-    gap: 8px;
-    padding: 8px 12px calc(10px + env(safe-area-inset-bottom, 0px));
-    border-top: 1px solid var(--line);
-    background: #fff;
-  }
-  #input {
-    flex: 1;
-    min-width: 0;
-    border: 1.5px solid var(--line);
-    border-radius: 999px;
-    padding: 10px 15px;
-    font: inherit;
-    font-size: 16px; /* 16px stops iOS zooming in */
-    outline: none;
-  }
-  #input:focus { border-color: var(--green); }
-  .icon-btn {
-    flex: none;
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    border: 0;
-    display: grid; place-items: center;
-    cursor: pointer;
-    font-size: 20px;
-  }
-  #mic { background: #eef5e4; color: var(--green-dark); }
-  #mic.listening { background: #e5533d; color: #fff; animation: pulse 1s infinite; }
-  @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(229,83,61,.5); } 50% { box-shadow: 0 0 0 8px rgba(229,83,61,0); } }
-  #send { background: var(--green); color: #fff; }
-  #send:disabled { opacity: .5; cursor: default; }
-  .note { text-align: center; font-size: 11.5px; color: var(--muted); padding: 0 16px 6px; background: #fff; }
+  /* Info strip */
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 28px; }
+  .fact { background: var(--green-soft); border-radius: var(--radius); padding: 18px 20px; }
+  .fact b { display: block; font-size: 18px; }
+  .fact span { color: var(--muted); font-size: 15px; }
+  .weather { margin-top: 18px; font-size: 15px; color: var(--muted); }
+
+  /* Stories */
+  .story { display: flex; flex-direction: column; }
+  .story .who { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .avatar { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; font-size: 24px; background: var(--green-soft); flex: none; }
+  .story .who small { display: block; color: var(--muted); font-size: 13.5px; }
+  blockquote { margin: 12px 0 0; padding: 12px 16px; border-left: 4px solid var(--sun); background: #fff8e3; border-radius: 0 12px 12px 0; font-style: italic; }
+
+  /* Farms table */
+  .table-wrap { overflow-x: auto; margin-top: 24px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--paper); }
+  table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 15px; }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  th { background: var(--green-soft); font-size: 13.5px; text-transform: uppercase; letter-spacing: .04em; }
+  tr:last-child td { border-bottom: 0; }
+  .tag { display: inline-block; font-size: 12.5px; padding: 2px 9px; border-radius: 999px; background: var(--green-soft); color: var(--green-dark); font-weight: 600; white-space: nowrap; }
+  .tag.self { background: #f1ecdc; color: #7a6a3a; }
+  .note { font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  /* Why */
+  .why li { margin-bottom: 8px; }
+  .why ol { padding-left: 22px; margin: 8px 0 0; }
+
+  /* Seasons */
+  .season h3 { display: flex; align-items: center; gap: 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .chip { background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 14.5px; }
+  .season.summer { background: #fff6dc; border-color: #f3e3b0; }
+  .season.winter { background: #eaf4e0; border-color: #d3e6c0; }
+
+  /* Numbers */
+  .numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 24px; }
+  .num { text-align: center; padding: 26px 16px; }
+  .num b { display: block; font-size: 42px; color: var(--green-dark); line-height: 1.1; }
+  .num span { color: var(--muted); font-size: 15px; }
+
+  /* CTA band */
+  .band { background: var(--green); color: #fff; border-radius: 28px; padding: 40px 28px; text-align: center; }
+  .band h2 { color: #fff; }
+  .band p { opacity: .92; max-width: 560px; margin-inline: auto; }
+  .band .btn { background: #fff; color: var(--green-dark); margin-top: 12px; }
+
+  footer { padding-block: 36px 48px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: grid; gap: 8px; }
 </style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <svg class="avatar" viewBox="0 0 100 100" aria-hidden="true"><use href="#cabbage"/></svg>
-    <div class="titles">
-      <h1>Choi Choi 菜菜</h1>
-      <p data-i18n="subtitle"></p>
-    </div>
-    <div class="lang" role="group" aria-label="Language">
-      <button type="button" data-lang="en">EN</button>
-      <button type="button" data-lang="yue">粵</button>
-    </div>
-  </header>
 
-  <main id="chat" aria-live="polite"></main>
-
-  <div id="quick"></div>
-
-  <form id="form" autocomplete="off">
-    <button type="button" id="mic" class="icon-btn" aria-label="Voice input" hidden>🎤</button>
-    <input id="input" type="text" maxlength="500" enterkeyhint="send">
-    <button type="submit" id="send" class="icon-btn" aria-label="Send">➤</button>
-  </form>
-  <div class="note" data-i18n="note"></div>
-</div>
-
-<!-- Choi Choi character (reused via <use>) -->
+<!-- Choi Choi character -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="cabbage" viewBox="0 0 100 100">
@@ -208,163 +181,265 @@
   </defs>
 </svg>
 
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cabbage"/></svg>Choi Choi 菜菜</a>
+    <div class="links">
+      <a href="#market"><span lang="en">The market</span><span lang="yue">農墟</span></a>
+      <a href="#farmers"><span lang="en">Farmers</span><span lang="yue">農夫</span></a>
+      <a href="#why"><span lang="en">Why organic costs more</span><span lang="yue">點解貴啲</span></a>
+      <a href="#seasons"><span lang="en">Seasons</span><span lang="yue">時令</span></a>
+      <a href="#project"><span lang="en">About us</span><span lang="yue">關於我哋</span></a>
+    </div>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="en">EN</button>
+      <button type="button" data-lang="yue">粵</button>
+    </div>
+  </div>
+</nav>
+
+<main id="top">
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="wrap">
+      <div>
+        <div class="kicker"><span lang="en">Central Farmers' Market · 中環農墟</span><span lang="yue">中環農墟 · Central Farmers' Market</span></div>
+        <h1>
+          <span lang="en">Hi, I'm Choi Choi <span class="zh">菜菜</span>!</span>
+          <span lang="yue">你好，我係<span class="zh">菜菜</span>！</span>
+        </h1>
+        <p class="lead">
+          <span lang="en">I'm a little cabbage from a Hong Kong organic farm. Ask me about the market, the farmers and what's in season – in English or Cantonese, by typing or talking.</span>
+          <span lang="yue">我係一棵嚟自香港有機農場嘅小椰菜。你可以用廣東話或者英文，打字或者講嘢，問我關於農墟、農夫同時令菜嘅嘢！</span>
+        </p>
+        <div class="cta">
+          <a class="btn" href="/chat">💬 <span lang="en">Chat with Choi Choi</span><span lang="yue">同菜菜傾偈</span></a>
+          <a class="btn ghost" href="#farmers"><span lang="en">Meet the farmers</span><span lang="yue">認識農夫</span></a>
+        </div>
+        <div class="when">
+          <span>📅 <b><span lang="en">Every Sunday</span><span lang="yue">逢星期日</span></b> 11:00–17:00</span>
+          <span>📍 <b><span lang="en">Star Ferry Central Pier No. 7</span><span lang="yue">中環天星碼頭 7 號</span></b></span>
+          <span>🎟️ <span lang="en">Free, no ticket</span><span lang="yue">免費入場</span></span>
+        </div>
+      </div>
+      <div class="mascot">
+        <div class="bubble">
+          <span lang="en">Psst… I know which veggies are sweetest in winter 🥬</span>
+          <span lang="yue">喂～我知冬天邊啲菜最甜㗎 🥬</span>
+        </div>
+        <svg viewBox="0 0 100 100" role="img" aria-label="Choi Choi the cabbage"><use href="#cabbage"/></svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- Market -->
+  <section id="market" class="alt">
+    <div class="wrap">
+      <div class="kicker"><span lang="en">The market</span><span lang="yue">農墟</span></div>
+      <h2><span lang="en">Real food, straight from the farmers</span><span lang="yue">由農夫直接賣畀你嘅真食物</span></h2>
+      <p class="lead">
+        <span lang="en">Since 2007, Kadoorie Farm and Botanic Garden (KFBG) and the Star Ferry have run a weekly organic market at Central Pier. It's a fair-trade platform: local farmers sell directly to you, so they get a fairer return, and you get fresh, locally grown greens with far fewer food miles.</span>
+        <span lang="yue">由 2007 年開始，嘉道理農場暨植物園（KFBG）同天星小輪每星期喺中環碼頭搞有機農墟。呢度係一個公平貿易平台：本地農夫直接賣菜畀你，佢哋得到更公平嘅回報，你就買到新鮮本地菜，食物里程又少好多。</span>
+      </p>
+      <div class="grid g3" style="margin-top:24px">
+        <div class="card"><div class="emoji">🥬</div><h3><span lang="en">Local organic produce</span><span lang="yue">本地有機農產品</span></h3><p><span lang="en">Vegetables, fruit and other farm products from eight New Territories farms.</span><span lang="yue">嚟自新界八個農場嘅蔬菜、水果同其他農產品。</span></p></div>
+        <div class="card"><div class="emoji">🌍</div><h3><span lang="en">Earth-friendly products</span><span lang="yue">環保產品</span></h3><p><span lang="en">Goods that help you live a simpler, lower-carbon life.</span><span lang="yue">幫你過簡單啲、低碳啲生活嘅產品。</span></p></div>
+        <div class="card"><div class="emoji">🧺</div><h3><span lang="en">Local handicrafts</span><span lang="yue">本地手作</span></h3><p><span lang="en">Made by Hong Kong artists and social enterprises.</span><span lang="yue">由香港藝術家同社企製作。</span></p></div>
+      </div>
+      <div class="facts">
+        <div class="fact"><b>📅 <span lang="en">Sundays</span><span lang="yue">逢星期日</span></b><span>11:00 am – 5:00 pm</span></div>
+        <div class="fact"><b>📍 <span lang="en">Central Pier No. 7</span><span lang="yue">中環 7 號碼頭</span></b><span lang="en">Star Ferry, Central</span><span lang="yue">中環天星碼頭</span></div>
+        <div class="fact"><b>📦 <span lang="en">Group buying (CSA)</span><span lang="yue">共同購買 (CSA)</span></b><span lang="en">Nov 2026 – Mar 2027, delivery or pick-up. Scan the QR code on the CSA poster.</span><span lang="yue">2026 年 11 月至 2027 年 3 月，送貨或自取。掃描 CSA 海報上嘅 QR code。</span></div>
+        <div class="fact"><b>📞 <span lang="en">Enquiries</span><span lang="yue">查詢</span></b><span>(852) 2483 7138 · sla@kfbg.org</span></div>
+      </div>
+      <p class="weather">
+        ⛈️ <span lang="en"><b>Bad weather?</b> KFBG checks signals at 7:00 am on Sunday. The market is <b>cancelled</b> if a Red or Black rainstorm signal, or Typhoon Signal No. 3 or above, is up. It still goes ahead with an Amber rainstorm signal, a thunderstorm warning or Typhoon Signal No. 1.</span>
+        <span lang="yue"><b>天氣唔好？</b>KFBG 會喺星期日朝早 7 點睇天氣信號。如果掛紅雨、黑雨，或者三號或以上風球，農墟會<b>取消</b>；如果只係黃雨、雷暴警告或者一號風球，就照常舉行。</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- Farmers -->
+  <section id="farmers">
+    <div class="wrap">
+      <div class="kicker"><span lang="en">Meet the farmers</span><span lang="yue">認識農夫</span></div>
+      <h2><span lang="en">The people behind your vegetables</span><span lang="yue">種出你啲菜嘅人</span></h2>
+      <p class="lead">
+        <span lang="en">On 21 September 2026 our team went to the market and talked to farmers and customers. Here's what they told us.</span>
+        <span lang="yue">2026 年 9 月 21 日，我哋去咗農墟同農夫同客人傾偈。以下係佢哋同我哋講嘅嘢。</span>
+      </p>
+
+      <div class="grid g3" style="margin-top:24px">
+        <article class="card story">
+          <div class="who"><div class="avatar">👨‍🍳</div><div><h3>Andrew</h3><small><span lang="en">Pig Kun Farm 豬君農園 · Tai Tong, Yuen Long</span><span lang="yue">豬君農園 · 元朗大棠</span></small></div></div>
+          <p><span lang="en">Andrew used to be a head chef at a big Chinese restaurant. Being a farmer was his dream since he was a kid – even though as a child he really didn't like eating vegetables! His family runs the farm on rented land, and it's HKORC certified.</span><span lang="yue">Andrew 以前係大酒樓嘅大廚。做農夫係佢細細個嘅夢想——雖然佢細個其實好唔鍾意食菜！農場由佢屋企人喺租返嚟嘅地經營，有 HKORC 有機認證。</span></p>
+          <blockquote><span lang="en">"Hong Kong can grow high-quality, unique and safe farm produce."</span><span lang="yue">「其實我哋香港都可以種出一啲好高品質、獨特同埋安全嘅農產品。」</span></blockquote>
+        </article>
+
+        <article class="card story">
+          <div class="who"><div class="avatar">👩‍🌾</div><div><h3>Rose</h3><small><span lang="en">Blue Girl Organic Farm · Yuen Long</span><span lang="yue">Blue Girl Organic Farm · 元朗</span></small></div></div>
+          <p><span lang="en">Rose's mum, Flora, started the farm because shop vegetables didn't taste like the ones from her childhood village. Their No. 1 best-seller for years: sweet potato leaves. They weed and catch bugs by hand – often at night.</span><span lang="yue">Rose 嘅媽媽 Flora 開農場，係因為街市啲菜唔似佢細個喺鄉下食嗰種味道。佢哋多年嚟賣得最好嘅係番薯葉。除草捉蟲全部靠人手，好多時仲要夜晚捉蟲。</span></p>
+          <blockquote><span lang="en">This summer: three months of heat and rain, and almost no harvest – but rent and wages still had to be paid.</span><span lang="yue">今年夏天：連續三個月又熱又落雨，差唔多冇收成——但租金同人工照樣要畀。</span></blockquote>
+        </article>
+
+        <article class="card story">
+          <div class="who"><div class="avatar">🧑‍🤝‍🧑</div><div><h3><span lang="en">A farming couple</span><span lang="yue">一對農夫夫婦</span></h3><small><span lang="en">Kam Tin, Yuen Long</span><span lang="yue">元朗錦田</span></small></div></div>
+          <p><span lang="en">Their happiest moment: when customers come back to say "that was delicious!" and buy again. They're honest about worms too – organic produce can't be fully controlled, so if a melon is bad inside, they make it up to you.</span><span lang="yue">佢哋最開心嘅時候：客人返嚟話「好好食呀！」再幫襯。佢哋對蟲都好坦白——有機嘢控制唔到㗎，如果個瓜入面壞咗，佢哋會補返畀你。</span></p>
+          <blockquote><span lang="en">"We just sell honestly. Farmers work really hard – it's not simple."</span><span lang="yue">「我哋平時靠老實賣嘢。農夫真係好辛苦，唔係咁簡單嘅。」</span></blockquote>
+        </article>
+      </div>
+
+      <h3 style="margin-top:40px"><span lang="en">The eight farms on KFBG's list</span><span lang="yue">KFBG 名單上嘅八個農場</span></h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th><span lang="en">Farm</span><span lang="yue">農場</span></th>
+            <th><span lang="en">Area</span><span lang="yue">地區</span></th>
+            <th><span lang="en">Since</span><span lang="yue">成立</span></th>
+            <th><span lang="en">Size</span><span lang="yue">面積</span></th>
+            <th><span lang="en">Organic status</span><span lang="yue">有機狀況</span></th>
+          </tr></thead>
+          <tbody>
+            <tr><td>Puppy Organic Farm</td><td><span lang="en">Yuen Long</span><span lang="yue">元朗</span></td><td>2003</td><td>3,080 m²</td><td><span class="tag">HKORC C24012</span></td></tr>
+            <tr><td>Ming Yuen Farm 🏆<small lang="en"> oldest</small><small lang="yue"> 最老</small></td><td><span lang="en">Ta Kwu Ling</span><span lang="yue">打鼓嶺</span></td><td>1950</td><td>3,920 m²</td><td><span class="tag self"><span lang="en">Self-claimed</span><span lang="yue">自稱有機</span></span></td></tr>
+            <tr><td>Ka Kin Farm</td><td><span lang="en">Yuen Long</span><span lang="yue">元朗</span></td><td>1980</td><td>6,760 m²</td><td><span class="tag">HKORC C09014</span></td></tr>
+            <tr><td>Blue Girl Organic Farm</td><td><span lang="en">Yuen Long</span><span lang="yue">元朗</span></td><td>2012</td><td>12,465 m²</td><td><span class="tag">HKORC C13025</span></td></tr>
+            <tr><td>AuLaw Organic Farm</td><td><span lang="en">Yuen Long</span><span lang="yue">元朗</span></td><td>2010</td><td>8,112 m²</td><td><span class="tag">HKORC C08004</span></td></tr>
+            <tr><td>Cham Shan Farm</td><td><span lang="en">Ta Kwu Ling</span><span lang="yue">打鼓嶺</span></td><td>2011</td><td>12,844 m²</td><td><span class="tag self"><span lang="en">Self-claimed</span><span lang="yue">自稱有機</span></span></td></tr>
+            <tr><td>Zen Organic Farm 🏆<small lang="en"> biggest</small><small lang="yue"> 最大</small></td><td><span lang="en">Ta Kwu Ling</span><span lang="yue">打鼓嶺</span></td><td>2009</td><td>20,280 m²</td><td><span class="tag">HKORC C09001</span></td></tr>
+            <tr><td>Pig Kun Farm 豬君農園 🌱<small lang="en"> youngest</small><small lang="yue"> 最年輕</small></td><td><span lang="en">Yuen Long</span><span lang="yue">元朗</span></td><td>2019</td><td>570 m²</td><td><span class="tag">HKORC C20012</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        <span lang="en">HKORC = Hong Kong Organic Resource Centre. Hong Kong has no law setting organic standards, so certification is voluntary. "Self-claimed" farms say they farm organically but don't hold the certificate – ask the farmer about their methods. Stall positions change, so just walk around and say hi!</span>
+        <span lang="yue">HKORC = 香港有機資源中心。香港冇法例規定有機標準，認證係自願嘅。「自稱有機」嘅農場話自己用有機方法耕種，但冇攞認證——想知佢哋點種，可以直接問農夫。攤位位置會變，行吓同農夫打個招呼啦！</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- Why more expensive -->
+  <section id="why" class="alt">
+    <div class="wrap">
+      <div class="kicker"><span lang="en">Straight from the farmers</span><span lang="yue">農夫親口講</span></div>
+      <h2><span lang="en">Why does organic cost more?</span><span lang="yue">點解有機菜貴啲？</span></h2>
+      <p class="lead"><span lang="en">We asked. Here's what the farmers said.</span><span lang="yue">我哋問咗，以下係農夫嘅答案。</span></p>
+      <div class="grid g2 why" style="margin-top:24px">
+        <div class="card">
+          <h3>👨‍🍳 Andrew · Pig Kun Farm</h3>
+          <ol>
+            <li><span lang="en">Organic fertiliser costs much more than chemical fertiliser.</span><span lang="yue">有機肥料貴過化肥好多。</span></li>
+            <li><span lang="en">Without chemical fertiliser, "a plant needs as many days as it needs" – slower growth, lower yields.</span><span lang="yue">唔用化肥，「佢需要幾多日生長就要幾多日」——生得慢，產量少。</span></li>
+            <li><span lang="en">Bugs! Natural sprays from plant extracts don't stop most insects, so a lot of the crop is lost.</span><span lang="yue">蟲！植物提煉嘅天然農藥對大部分蟲都冇乜用，所以損耗好大。</span></li>
+          </ol>
+          <blockquote><span lang="en">"We sell at a higher price, but we don't actually earn more money."</span><span lang="yue">「賣貴咗，亦都冇賺多咗錢，其實。」</span></blockquote>
+        </div>
+        <div class="card">
+          <h3>👩‍🌾 Rose · Blue Girl Organic Farm</h3>
+          <ol>
+            <li><span lang="en">Hong Kong land rent is expensive – the farm rents its land.</span><span lang="yue">香港地租好貴——農場嘅地係租返嚟。</span></li>
+            <li><span lang="en">High wages, and hiring foreign workers because few locals want to farm.</span><span lang="yue">人工貴，而且本地少人做農夫，要請外勞。</span></li>
+            <li><span lang="en">No weedkiller means weeding and catching bugs by hand – often at night.</span><span lang="yue">唔用除草劑，就要人手除草捉蟲——好多時夜晚都要捉。</span></li>
+            <li><span lang="en">Small fields are hard to work with big machines.</span><span lang="yue">田細，大型機械好難用。</span></li>
+          </ol>
+          <blockquote><span lang="en">She feels the price is fair for what you get.</span><span lang="yue">佢覺得個價錢對得住啲菜。</span></blockquote>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seasons -->
+  <section id="seasons">
+    <div class="wrap">
+      <div class="kicker"><span lang="en">Eat with the seasons</span><span lang="yue">食時令</span></div>
+      <h2><span lang="en">What's in season?</span><span lang="yue">而家有咩時令菜？</span></h2>
+      <p class="lead"><span lang="en">A guide from the farmers we met. What's actually on the tables depends on the weather – ask at the stalls!</span><span lang="yue">以下係我哋訪問嘅農夫提供嘅參考。每日有咩賣要睇天氣，最好去攤位問吓！</span></p>
+      <div class="grid g2" style="margin-top:24px">
+        <div class="card season winter">
+          <h3>❄️ <span lang="en">Autumn – Winter (about Oct–Mar)</span><span lang="yue">秋冬（大約 10 月至 3 月）</span></h3>
+          <p><span lang="en">The best season – farmers and customers agree winter has the most vegetables.</span><span lang="yue">最好嘅季節——農夫同客人都話冬天菜最多。</span></p>
+          <div class="chips">
+            <span class="chip">菜心 Choi sum</span><span class="chip">芥蘭 Gai lan</span><span class="chip">椰菜 Cabbage</span><span class="chip">白菜 Bok choy</span><span class="chip">菠菜 Spinach</span><span class="chip">羽衣甘藍 Kale</span><span class="chip">西蘭花 Broccoli</span><span class="chip">椰菜花 Cauliflower</span><span class="chip">番茄 Tomato</span>
+          </div>
+        </div>
+        <div class="card season summer">
+          <h3>☀️ <span lang="en">Summer (about Jun–Sep)</span><span lang="yue">夏天（大約 6 月至 9 月）</span></h3>
+          <p><span lang="en">Melon season – time for winter melon soup!</span><span lang="yue">瓜季——飲冬瓜湯嘅時候！</span></p>
+          <div class="chips">
+            <span class="chip">冬瓜 Winter melon</span><span class="chip">苦瓜 Bitter melon</span><span class="chip">番薯葉 Sweet potato leaves</span><span class="chip">通菜 Water spinach</span><span class="chip">莧菜 Amaranth</span><span class="chip">菜仔 Small greens</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Numbers -->
+  <section class="alt">
+    <div class="wrap">
+      <div class="kicker"><span lang="en">Why local matters</span><span lang="yue">點解要支持本地</span></div>
+      <h2><span lang="en">Hong Kong farming in numbers</span><span lang="yue">數字睇香港農業</span></h2>
+      <div class="numbers">
+        <div class="card num"><b>1.7%</b><span lang="en">of fresh vegetables eaten in Hong Kong are grown locally (AFCD, 2025)</span><span lang="yue">香港人食嘅新鮮蔬菜係本地種（漁護署，2025）</span></div>
+        <div class="card num"><b>120,000</b><span lang="en">farmers in Hong Kong in 1961</span><span lang="yue">1961 年香港嘅農夫人數</span></div>
+        <div class="card num"><b>4,300</b><span lang="en">farmers left in 2025 – because of urbanisation and cheap imports</span><span lang="yue">2025 年剩返嘅農夫——因為城市化同平價進口食物</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Project -->
+  <section id="project">
+    <div class="wrap">
+      <div class="band">
+        <svg viewBox="0 0 100 100" width="84" height="84" aria-hidden="true"><use href="#cabbage"/></svg>
+        <h2><span lang="en">Got a question? Ask Choi Choi!</span><span lang="yue">有問題？問菜菜啦！</span></h2>
+        <p><span lang="en">Type or talk in English or Cantonese. No app, no login, no personal data. Then go say hi to the farmers at their stalls!</span><span lang="yue">用廣東話或者英文打字、講嘢都得。唔使裝 app、唔使登入、唔收集個人資料。問完就去攤位同農夫打個招呼啦！</span></p>
+        <a class="btn" href="/chat">💬 <span lang="en">Start chatting</span><span lang="yue">開始傾偈</span></a>
+      </div>
+
+      <div class="grid g2" style="margin-top:40px">
+        <div>
+          <div class="kicker"><span lang="en">About this project</span><span lang="yue">關於呢個計劃</span></div>
+          <h3><span lang="en">Closing the gap between farmers and young people</span><span lang="yue">拉近農夫同年輕人嘅距離</span></h3>
+          <p><span lang="en">Choi Choi was made by Group 2 of ITS2028 Global Challenges II at Hong Kong Baptist University. Most market customers are over 40, and farmers told us they'd love more young people to know about local farming. Choi Choi is our way of helping young visitors start a conversation.</span><span lang="yue">菜菜係香港浸會大學 ITS2028 Global Challenges II 第二組嘅作品。農墟大部分客人都係 40 歲以上，農夫話好想多啲年輕人認識本地農業。菜菜就係我哋幫年輕人同農夫打開話匣子嘅方法。</span></p>
+        </div>
+        <div>
+          <div class="kicker"><span lang="en">Good to know</span><span lang="yue">注意</span></div>
+          <p><span lang="en">Choi Choi is a cabbage, not an expert 🥬 It answers from information on the KFBG website (checked 8 Nov 2026) and our own interviews, and sends harder questions – prices, spraying, health – to the farmers.</span><span lang="yue">菜菜係一棵椰菜，唔係專家 🥬 佢嘅答案來自 KFBG 網站資料（2026 年 11 月 8 日查閱）同我哋嘅訪問；價錢、農藥、健康呢類問題，佢會叫你問農夫。</span></p>
+          <p><span lang="en">This is a student project, not an official KFBG website. For official information visit </span><span lang="yue">呢個係學生計劃，唔係 KFBG 官方網站。官方資料請瀏覽 </span><a href="https://www.kfbg.org" target="_blank" rel="noopener">www.kfbg.org</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>🥬 Choi Choi 菜菜 · ITS2028 Group 2 · HKBU · 2026</div>
+    <div><span lang="en">Sources: KFBG website (checked 8 Nov 2026); AFCD (2025); our interviews at the market (21 Sep 2026).</span><span lang="yue">資料來源：KFBG 網站（2026 年 11 月 8 日查閱）；漁護署（2025）；我哋喺農墟嘅訪問（2026 年 9 月 21 日）。</span></div>
+  </div>
+</footer>
+
 <script>
-(() => {
-  const T = {
-    en: {
-      subtitle: "Your cabbage friend at the Central Farmers' Market",
-      placeholder: "Ask Choi Choi anything…",
-      note: "Choi Choi is a cabbage, not an expert 🥬 Please don't share personal details.",
-      hello: "Hi! I'm Choi Choi 菜菜, a little cabbage from a Hong Kong organic farm 🥬\nAsk me about the market, the farmers, or local farming. You can type or tap 🎤 to talk!",
-      quick: ["What's in season?", "Meet the farmers", "Why is organic more expensive?", "When is the market open?", "What's HKORC certified?", "KFBG events"],
-      error: "Oops, my leaves got tangled 🥬 Please try again in a moment!",
-      noMic: "Sorry, voice input doesn't work in this browser. Please type instead!",
-      mic: "en-US",
-    },
-    yue: {
-      subtitle: "中環農墟嘅椰菜朋友",
-      placeholder: "問吓菜菜啦…",
-      note: "菜菜係一棵椰菜，唔係專家 🥬 請唔好分享個人資料。",
-      hello: "你好！我係菜菜，一棵嚟自香港有機農場嘅小椰菜 🥬\n你可以問我關於農墟、農夫或者本地耕種嘅嘢。打字或者撳 🎤 講嘢都得！",
-      quick: ["而家有咩時令菜？", "認識吓啲農夫", "點解有機菜貴啲？", "農墟幾點開？", "咩係 HKORC 認證？", "嘉道理有咩活動？"],
-      error: "哎呀，我啲葉打晒結 🥬 請遲啲再試吓！",
-      noMic: "唔好意思，呢個瀏覽器用唔到語音輸入，請打字啦！",
-      mic: "zh-HK",
-    },
-  };
-
-  const $ = (s) => document.querySelector(s);
-  const chat = $("#chat"), input = $("#input"), form = $("#form"),
-        sendBtn = $("#send"), micBtn = $("#mic"), quick = $("#quick");
-
-  let lang = "en";
-  try { lang = localStorage.getItem("cc-lang") || (/^zh/i.test(navigator.language) ? "yue" : "en"); } catch {}
-  const history = []; // {role, content} – kept only in this tab, never stored
-  let busy = false;
-
-  function applyLang() {
-    const t = T[lang];
-    document.documentElement.lang = lang === "yue" ? "zh-HK" : "en";
-    document.querySelectorAll("[data-i18n]").forEach((el) => (el.textContent = t[el.dataset.i18n]));
-    document.querySelectorAll(".lang button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === lang));
-    input.placeholder = t.placeholder;
-    quick.innerHTML = "";
-    t.quick.forEach((q) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.textContent = q;
-      b.onclick = () => ask(q);
-      quick.appendChild(b);
-    });
-    if (recog) recog.lang = t.mic;
-  }
-
-  function mini() {
-    const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    s.setAttribute("viewBox", "0 0 100 100");
-    s.classList.add("mini");
-    s.innerHTML = '<use href="#cabbage"/>';
-    return s;
-  }
-
-  function addMsg(role, text, cls) {
-    const row = document.createElement("div");
-    row.className = "row " + (role === "user" ? "me" : "bot");
-    if (role !== "user") row.appendChild(mini());
-    const b = document.createElement("div");
-    b.className = "bubble" + (cls ? " " + cls : "");
-    if (cls === "typing") b.innerHTML = "<span></span><span></span><span></span>";
-    else b.textContent = text;
-    row.appendChild(b);
-    chat.appendChild(row);
-    chat.scrollTop = chat.scrollHeight;
-    return row;
-  }
-
-  function showHello() {
-    chat.innerHTML = '<div class="hero"><svg class="big" viewBox="0 0 100 100" aria-hidden="true"><use href="#cabbage"/></svg></div>';
-    addMsg("assistant", T[lang].hello);
-  }
-
-  async function ask(text) {
-    text = text.trim();
-    if (!text || busy) return;
-    busy = true;
-    sendBtn.disabled = true;
-    input.value = "";
-    addMsg("user", text);
-    history.push({ role: "user", content: text });
-    const typing = addMsg("assistant", "", "typing");
-
-    try {
-      const r = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history.slice(-12) }),
-      });
-      const data = await r.json().catch(() => ({}));
-      typing.remove();
-      if (!r.ok || !data.reply) throw new Error(data.error || r.status);
-      history.push({ role: "assistant", content: data.reply });
-      addMsg("assistant", data.reply);
-    } catch (e) {
-      typing.remove();
-      history.pop(); // let the user retry the same question
-      addMsg("assistant", T[lang].error, "error");
-    } finally {
-      busy = false;
-      sendBtn.disabled = false;
+  (() => {
+    const root = document.documentElement;
+    let lang = "en";
+    try { lang = localStorage.getItem("cc-lang") || (/^zh/i.test(navigator.language) ? "yue" : "en"); } catch {}
+    function apply() {
+      root.classList.remove("lang-en", "lang-yue");
+      root.classList.add("lang-" + lang);
+      root.lang = lang === "yue" ? "zh-HK" : "en";
+      document.querySelectorAll(".lang button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === lang));
     }
-  }
-
-  form.addEventListener("submit", (e) => { e.preventDefault(); ask(input.value); });
-
-  document.querySelectorAll(".lang button").forEach((b) =>
-    b.addEventListener("click", () => {
-      lang = b.dataset.lang;
-      try { localStorage.setItem("cc-lang", lang); } catch {}
-      const fresh = history.length === 0;
-      applyLang();
-      if (fresh) showHello();
-    })
-  );
-
-  // Voice input (Web Speech API). Works in Chrome, Edge and iOS/macOS Safari.
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let recog = null, listening = false;
-  if (SR) {
-    recog = new SR();
-    recog.interimResults = true;
-    recog.continuous = false;
-    recog.maxAlternatives = 1;
-    micBtn.hidden = false;
-    recog.onresult = (e) => {
-      let txt = "";
-      for (const r of e.results) txt += r[0].transcript;
-      input.value = txt;
-      if (e.results[e.results.length - 1].isFinal) {
-        recog.stop();
-        ask(txt);
-      }
-    };
-    recog.onend = () => { listening = false; micBtn.classList.remove("listening"); };
-    recog.onerror = (e) => {
-      if (e.error === "not-allowed" || e.error === "service-not-allowed") addMsg("assistant", T[lang].noMic, "error");
-    };
-    micBtn.addEventListener("click", () => {
-      if (listening) { recog.stop(); return; }
-      recog.lang = T[lang].mic;
-      try {
-        recog.start();
-        listening = true;
-        micBtn.classList.add("listening");
-      } catch {}
-    });
-  }
-
-  applyLang();
-  showHello();
-})();
+    document.querySelectorAll(".lang button").forEach((b) =>
+      b.addEventListener("click", () => {
+        lang = b.dataset.lang;
+        try { localStorage.setItem("cc-lang", lang); } catch {}
+        apply();
+      })
+    );
+    apply();
+  })();
 </script>
 </body>
 </html>
