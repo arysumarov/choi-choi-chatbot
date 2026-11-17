@@ -4,20 +4,23 @@
 <meta charset="utf-8">
 <meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#5f9e3a">
+<meta name="theme-color" content="#6b9a4f">
 <title>Choi Choi 菜菜</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥬</text></svg>">
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<meta property="og:image" content="https://choi-choi-chatbot.vercel.app/assets/choichoi-poster.jpg">
+<meta property="og:title" content="Choi Choi 菜菜 · Central Farmers' Market">
 <style>
   :root {
-    --green: #5f9e3a;
-    --green-dark: #3f7322;
+    --green: #6b9a4f;
+    --green-dark: #4a7236;
     --leaf: #a8d672;
-    --cream: #fbf8ee;
-    --ink: #2b3a1f;
-    --muted: #6b7a5e;
-    --bubble-bot: #ffffff;
-    --bubble-me: #dff0c8;
-    --line: #e4e9d8;
+    --cream: #f4ecdf;
+    --ink: #4a3a2a;
+    --muted: #7a6a58;
+    --bubble-bot: #fffdf8;
+    --bubble-me: #e3ebd3;
+    --line: #e6dccb;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
@@ -46,7 +49,7 @@
     background: var(--green);
     color: #fff;
   }
-  header .avatar { width: 46px; height: 46px; flex: none; display: block; }
+  header .avatar { width: 46px; height: 46px; flex: none; display: block; object-fit: contain; background: var(--cream); border-radius: 50%; padding: 3px; }
   header .home { flex: none; line-height: 0; }
   header h1 { font-size: 18px; margin: 0; line-height: 1.2; }
   header p { margin: 0; font-size: 12px; opacity: .9; }
@@ -87,7 +90,7 @@
   }
   .row { display: flex; gap: 8px; align-items: flex-end; }
   .row.me { justify-content: flex-end; }
-  .row .mini { width: 30px; height: 30px; flex: none; }
+  .row .mini { width: 32px; height: 32px; flex: none; object-fit: contain; }
   .bubble {
     max-width: 80%;
     padding: 10px 13px;
@@ -111,7 +114,7 @@
 
   /* Hero (first screen) */
   .hero { text-align: center; padding: 8px 0 4px; }
-  .hero .big { width: 120px; height: 120px; animation: wiggle 3s ease-in-out infinite; }
+  .hero .big { width: 110px; height: auto; animation: wiggle 3s ease-in-out infinite; transform-origin: 50% 90%; }
   @keyframes wiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
 
   /* Quick replies */
@@ -179,7 +182,7 @@
 <body>
 <div class="app">
   <header>
-    <a href="/" class="home" aria-label="Home"><svg class="avatar" viewBox="0 0 100 100" aria-hidden="true"><use href="#cabbage"/></svg></a>
+    <a href="/" class="home" aria-label="Home"><img class="avatar" src="/assets/choichoi-256.webp" alt="" width="46" height="46"></a>
     <div class="titles">
       <h1>Choi Choi 菜菜</h1>
       <p data-i18n="subtitle"></p>
@@ -203,26 +206,6 @@
   <div class="note" data-i18n="note"></div>
 </div>
 
-<!-- Choi Choi character (reused via <use>) -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs>
-    <symbol id="cabbage" viewBox="0 0 100 100">
-      <ellipse cx="50" cy="93" rx="28" ry="4" fill="#000" opacity=".08"/>
-      <path d="M50 8 C22 8 8 30 10 55 C12 80 30 92 50 92 C70 92 88 80 90 55 C92 30 78 8 50 8Z" fill="#8cc75a"/>
-      <path d="M14 46 C10 26 30 10 46 16 C34 24 26 36 26 52Z" fill="#6fae3e"/>
-      <path d="M86 46 C90 26 70 10 54 16 C66 24 74 36 74 52Z" fill="#6fae3e"/>
-      <path d="M50 22 C34 22 24 38 25 56 C26 76 38 86 50 86 C62 86 74 76 75 56 C76 38 66 22 50 22Z" fill="#c4e89a"/>
-      <path d="M50 22 L50 40 M50 40 L42 32 M50 40 L58 32" stroke="#9fd06c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <circle cx="40" cy="56" r="4.2" fill="#2b3a1f"/>
-      <circle cx="60" cy="56" r="4.2" fill="#2b3a1f"/>
-      <circle cx="41.4" cy="54.6" r="1.4" fill="#fff"/>
-      <circle cx="61.4" cy="54.6" r="1.4" fill="#fff"/>
-      <ellipse cx="33" cy="65" rx="5" ry="3" fill="#f5a3a3" opacity=".8"/>
-      <ellipse cx="67" cy="65" rx="5" ry="3" fill="#f5a3a3" opacity=".8"/>
-      <path d="M44 66 Q50 72 56 66" stroke="#2b3a1f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    </symbol>
-  </defs>
-</svg>
 
 <script>
 (() => {
@@ -345,11 +328,11 @@
   }
 
   function mini() {
-    const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    s.setAttribute("viewBox", "0 0 100 100");
-    s.classList.add("mini");
-    s.innerHTML = '<use href="#cabbage"/>';
-    return s;
+    const img = document.createElement("img");
+    img.src = "/assets/choichoi-256.webp";
+    img.alt = "";
+    img.className = "mini";
+    return img;
   }
 
   function addMsg(role, text, cls) {
@@ -376,7 +359,7 @@
   }
 
   function showHello() {
-    chat.innerHTML = '<div class="hero"><svg class="big" viewBox="0 0 100 100" aria-hidden="true"><use href="#cabbage"/></svg></div>';
+    chat.innerHTML = '<div class="hero"><img class="big" src="/assets/choichoi.webp" alt="Choi Choi" width="476" height="600"></div>';
     addMsg("assistant", T[lang].hello);
   }
 

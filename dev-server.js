@@ -38,6 +38,15 @@ http
       });
       return;
     }
+    // Static files in /assets (images)
+    if (req.url.startsWith("/assets/")) {
+      const f = path.join(__dirname, "assets", path.basename(req.url.split(/[?#]/)[0]));
+      const types = { ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml" };
+      if (fs.existsSync(f)) {
+        res.setHeader("Content-Type", types[path.extname(f)] || "application/octet-stream");
+        return fs.createReadStream(f).pipe(res);
+      }
+    }
     // Same as Vercel "cleanUrls": / → index.html, /chat → chat.html
     const page = req.url.split(/[?#]/)[0].replace(/\.html$/, "").replace(/\/$/, "") || "/index";
     const file = path.join(__dirname, path.basename(page) + ".html");

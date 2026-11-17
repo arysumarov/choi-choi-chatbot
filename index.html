@@ -4,21 +4,27 @@
 <meta charset="utf-8">
 <meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#5f9e3a">
+<meta name="theme-color" content="#f4ecdf">
 <meta name="description" content="Choi Choi 菜菜 – a little Hong Kong cabbage who helps you meet the local organic farmers at the Central Farmers' Market.">
 <title>Choi Choi 菜菜 · Central Farmers' Market</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥬</text></svg>">
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<meta property="og:image" content="https://choi-choi-chatbot.vercel.app/assets/choichoi-poster.jpg">
+<meta property="og:title" content="Choi Choi 菜菜 · Central Farmers' Market">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --green: #5f9e3a;
-    --green-dark: #3f7322;
-    --green-soft: #dff0c8;
-    --cream: #fbf8ee;
-    --paper: #ffffff;
-    --ink: #2b3a1f;
-    --muted: #66745a;
-    --line: #e4e9d8;
-    --sun: #f6c453;
+    --green: #6b9a4f;
+    --green-dark: #4a7236;
+    --green-soft: #e3ebd3;
+    --cream: #f4ecdf;
+    --paper: #fbf7ef;
+    --ink: #4a3a2a;
+    --muted: #7a6a58;
+    --line: #e6dccb;
+    --sun: #f2cf5b;
+    --script: "Dancing Script", "Snell Roundhand", "Brush Script MT", cursive;
     --radius: 20px;
   }
   * { box-sizing: border-box; }
@@ -48,13 +54,13 @@
   /* Nav */
   nav {
     position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
-    background: rgba(251, 248, 238, .92);
+    background: rgba(244, 236, 223, .92);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--line);
   }
   nav .wrap { display: flex; align-items: center; gap: 16px; height: 60px; }
   .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; text-decoration: none; color: var(--ink); font-size: 18px; }
-  .brand svg { width: 34px; height: 34px; }
+  .brand img { width: 34px; height: 34px; object-fit: contain; }
   .links { display: flex; gap: 18px; margin-left: auto; }
   .links a { text-decoration: none; color: var(--ink); font-size: 15px; }
   .links a:hover { color: var(--green-dark); }
@@ -83,9 +89,10 @@
   .hero .when { margin-top: 22px; font-size: 15px; color: var(--muted); display: flex; gap: 8px 18px; flex-wrap: wrap; }
   .hero .when b { color: var(--ink); }
   .mascot { position: relative; text-align: center; }
-  .mascot svg { width: min(340px, 80%); height: auto; animation: wiggle 3.5s ease-in-out infinite; }
+  .mascot-img { width: min(300px, 75%); height: auto; animation: wiggle 3.5s ease-in-out infinite; transform-origin: 50% 90%; }
+  .tagline { font-family: var(--script); font-size: clamp(22px, 3vw, 28px); color: var(--ink); margin-top: 6px; }
   .bubble {
-    position: absolute; top: 2%; left: 0; z-index: 1;
+    position: absolute; top: 4%; left: -12%; z-index: 1;
     background: var(--paper); border: 1px solid var(--line); border-radius: 18px 18px 18px 4px;
     padding: 10px 14px; font-size: 15px; box-shadow: 0 6px 18px rgba(0,0,0,.06); max-width: 220px; text-align: left;
   }
@@ -94,7 +101,7 @@
     .hero .wrap { grid-template-columns: minmax(0, 1fr); text-align: center; }
     .hero .cta, .hero .when { justify-content: center; }
     .mascot { order: -1; }
-    .mascot svg { width: 200px; }
+    .mascot-img { width: 190px; }
     .bubble { position: static; display: inline-block; margin-bottom: 8px; }
   }
 
@@ -105,7 +112,11 @@
   .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
   .card .emoji { font-size: 30px; line-height: 1; margin-bottom: 10px; }
   .alt { background: var(--paper); border-block: 1px solid var(--line); }
-  .alt .card { background: var(--cream); }
+  .alt .card { background: #fffdf8; }
+
+  .market-head { display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; align-items: center; }
+  .market-logo { width: 100%; max-width: 420px; height: auto; justify-self: center; }
+  @media (max-width: 760px) { .market-head { grid-template-columns: minmax(0, 1fr); } .market-logo { max-width: 300px; } }
 
   /* Info strip */
   .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 28px; }
@@ -160,30 +171,10 @@
 </head>
 <body>
 
-<!-- Choi Choi character -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs>
-    <symbol id="cabbage" viewBox="0 0 100 100">
-      <ellipse cx="50" cy="93" rx="28" ry="4" fill="#000" opacity=".08"/>
-      <path d="M50 8 C22 8 8 30 10 55 C12 80 30 92 50 92 C70 92 88 80 90 55 C92 30 78 8 50 8Z" fill="#8cc75a"/>
-      <path d="M14 46 C10 26 30 10 46 16 C34 24 26 36 26 52Z" fill="#6fae3e"/>
-      <path d="M86 46 C90 26 70 10 54 16 C66 24 74 36 74 52Z" fill="#6fae3e"/>
-      <path d="M50 22 C34 22 24 38 25 56 C26 76 38 86 50 86 C62 86 74 76 75 56 C76 38 66 22 50 22Z" fill="#c4e89a"/>
-      <path d="M50 22 L50 40 M50 40 L42 32 M50 40 L58 32" stroke="#9fd06c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <circle cx="40" cy="56" r="4.2" fill="#2b3a1f"/>
-      <circle cx="60" cy="56" r="4.2" fill="#2b3a1f"/>
-      <circle cx="41.4" cy="54.6" r="1.4" fill="#fff"/>
-      <circle cx="61.4" cy="54.6" r="1.4" fill="#fff"/>
-      <ellipse cx="33" cy="65" rx="5" ry="3" fill="#f5a3a3" opacity=".8"/>
-      <ellipse cx="67" cy="65" rx="5" ry="3" fill="#f5a3a3" opacity=".8"/>
-      <path d="M44 66 Q50 72 56 66" stroke="#2b3a1f" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    </symbol>
-  </defs>
-</svg>
 
 <nav>
   <div class="wrap">
-    <a class="brand" href="#top"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#cabbage"/></svg>Choi Choi 菜菜</a>
+    <a class="brand" href="#top"><img src="/assets/choichoi-256.webp" alt="" width="34" height="34">Choi Choi 菜菜</a>
     <div class="links">
       <a href="#market"><span lang="en">The market</span><span lang="yue">農墟</span></a>
       <a href="#farmers"><span lang="en">Farmers</span><span lang="yue">農夫</span></a>
@@ -228,7 +219,8 @@
           <span lang="en">Psst… I know which veggies are sweetest in winter 🥬</span>
           <span lang="yue">喂～我知冬天邊啲菜最甜㗎 🥬</span>
         </div>
-        <svg viewBox="0 0 100 100" role="img" aria-label="Choi Choi the cabbage"><use href="#cabbage"/></svg>
+        <img class="mascot-img" src="/assets/choichoi.webp" alt="Choi Choi, a little Hong Kong bok choy" width="476" height="600">
+        <p class="tagline">Rooted in Hong Kong, Growing Sustainably.</p>
       </div>
     </div>
   </header>
@@ -236,12 +228,17 @@
   <!-- Market -->
   <section id="market" class="alt">
     <div class="wrap">
+      <div class="market-head">
+      <div>
       <div class="kicker"><span lang="en">The market</span><span lang="yue">農墟</span></div>
       <h2><span lang="en">Real food, straight from the farmers</span><span lang="yue">由農夫直接賣畀你嘅真食物</span></h2>
       <p class="lead">
         <span lang="en">Since 2007, Kadoorie Farm and Botanic Garden (KFBG) and the Star Ferry have run a weekly organic market at Central Pier. It's a fair-trade platform: local farmers sell directly to you, so they get a fairer return, and you get fresh, locally grown greens with far fewer food miles.</span>
         <span lang="yue">由 2007 年開始，嘉道理農場暨植物園（KFBG）同天星小輪每星期喺中環碼頭搞有機農墟。呢度係一個公平貿易平台：本地農夫直接賣菜畀你，佢哋得到更公平嘅回報，你就買到新鮮本地菜，食物里程又少好多。</span>
       </p>
+      </div>
+      <img class="market-logo" src="/assets/market-logo.webp" alt="中環農墟 Central Farm Market · From City to Soil" width="800" height="643" loading="lazy">
+      </div>
       <div class="grid g3" style="margin-top:24px">
         <div class="card"><div class="emoji">🥬</div><h3><span lang="en">Local organic produce</span><span lang="yue">本地有機農產品</span></h3><p><span lang="en">Vegetables, fruit and other farm products from eight New Territories farms.</span><span lang="yue">嚟自新界八個農場嘅蔬菜、水果同其他農產品。</span></p></div>
         <div class="card"><div class="emoji">🌍</div><h3><span lang="en">Earth-friendly products</span><span lang="yue">環保產品</span></h3><p><span lang="en">Goods that help you live a simpler, lower-carbon life.</span><span lang="yue">幫你過簡單啲、低碳啲生活嘅產品。</span></p></div>
@@ -391,7 +388,7 @@
   <section id="project">
     <div class="wrap">
       <div class="band">
-        <svg viewBox="0 0 100 100" width="84" height="84" aria-hidden="true"><use href="#cabbage"/></svg>
+        <img src="/assets/choichoi-256.webp" alt="" width="110" height="110" style="margin-bottom:4px">
         <h2><span lang="en">Got a question? Ask Choi Choi!</span><span lang="yue">有問題？問菜菜啦！</span></h2>
         <p><span lang="en">Type or talk in English or Cantonese. No app, no login, no personal data. Then go say hi to the farmers at their stalls!</span><span lang="yue">用廣東話或者英文打字、講嘢都得。唔使裝 app、唔使登入、唔收集個人資料。問完就去攤位同農夫打個招呼啦！</span></p>
         <a class="btn" href="/chat">💬 <span lang="en">Start chatting</span><span lang="yue">開始傾偈</span></a>
