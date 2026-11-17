@@ -51,6 +51,17 @@
   header h1 { font-size: 18px; margin: 0; line-height: 1.2; }
   header p { margin: 0; font-size: 12px; opacity: .9; }
   header .titles { flex: 1; min-width: 0; }
+  .spk {
+    flex: none; width: 36px; height: 36px; border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,.8); background: transparent;
+    font-size: 17px; cursor: pointer; display: grid; place-items: center;
+  }
+  .spk[aria-pressed="true"] { background: #fff; }
+  .replay {
+    flex: none; align-self: flex-end; border: 0; background: transparent;
+    font-size: 16px; cursor: pointer; opacity: .55; padding: 4px;
+  }
+  .replay:hover, .replay.playing { opacity: 1; }
   .lang {
     display: flex;
     border: 1.5px solid rgba(255,255,255,.8);
@@ -173,6 +184,7 @@
       <h1>Choi Choi 菜菜</h1>
       <p data-i18n="subtitle"></p>
     </div>
+    <button type="button" id="speak" class="spk" aria-pressed="false" aria-label="Read replies aloud" hidden>🔇</button>
     <div class="lang" role="group" aria-label="Language">
       <button type="button" data-lang="en">EN</button>
       <button type="button" data-lang="yue">粵</button>
@@ -250,6 +262,71 @@
   const history = []; // {role, content} – kept only in this tab, never stored
   let busy = false;
 
+  // ---- Voice output (browser speechSynthesis – free, runs on the phone) ----
+  const synth = window.speechSynthesis || null;
+  let speakOn = false, unlocked = false, voices = [];
+  try { speakOn = localStorage.getItem("cc-speak") === "1"; } catch {}
+  const loadVoices = () => { voices = synth ? synth.getVoices() : []; };
+  if (synth) { loadVoices(); synth.addEventListener?.("voiceschanged", loadVoices); }
+
+  function pickVoice(yue) {
+    const prefs = yue ? [/^zh[-_]HK/i, /^yue/i] : [/^en[-_]US/i, /^en[-_]GB/i, /^en/i];
+    for (const re of prefs) {
+      const v = voices.find((v) => re.test(v.lang));
+      if (v) return v;
+    }
+    return null;
+  }
+
+  // iOS only allows speech that starts inside a tap, so "unlock" it on the first tap.
+  function unlock() {
+    if (!synth || unlocked) return;
+    const u = new SpeechSynthesisUtterance(" ");
+    u.volume = 0;
+    synth.speak(u);
+    unlocked = true;
+  }
+
+  function speak(text, btn) {
+    if (!synth) return;
+    synth.cancel();
+    document.querySelectorAll(".replay.playing").forEach((b) => b.classList.remove("playing"));
+    const yue = /[\u3400-\u9fff]/.test(text);
+    const voice = pickVoice(yue);
+    const clean = text
+      .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}]/gu, "")
+      .replace(/[~～]/g, " ");
+    // Speak sentence by sentence (Chrome cuts off long utterances).
+    const parts = (clean.match(/[^。！？!?\n]+[。！？!?]*/g) || []).map((p) => p.trim()).filter(Boolean);
+    parts.forEach((p, i) => {
+      const u = new SpeechSynthesisUtterance(p);
+      u.lang = voice ? voice.lang : yue ? "zh-HK" : "en-US";
+      if (voice) u.voice = voice;
+      u.rate = 1;
+      u.pitch = 1.15; // a bit higher – it's a little cabbage
+      if (btn && i === 0) u.onstart = () => btn.classList.add("playing");
+      if (btn && i === parts.length - 1) u.onend = () => btn.classList.remove("playing");
+      synth.speak(u);
+    });
+  }
+
+  const spkBtn = $("#speak");
+  function showSpeak() {
+    spkBtn.textContent = speakOn ? "🔊" : "🔇";
+    spkBtn.setAttribute("aria-pressed", speakOn);
+  }
+  if (synth) {
+    spkBtn.hidden = false;
+    showSpeak();
+    spkBtn.addEventListener("click", () => {
+      unlock();
+      speakOn = !speakOn;
+      try { localStorage.setItem("cc-speak", speakOn ? "1" : "0"); } catch {}
+      if (!speakOn) synth.cancel();
+      showSpeak();
+    });
+  }
+
   function applyLang() {
     const t = T[lang];
     document.documentElement.lang = lang === "yue" ? "zh-HK" : "en";
@@ -284,6 +361,15 @@
     if (cls === "typing") b.innerHTML = "<span></span><span></span><span></span>";
     else b.textContent = text;
     row.appendChild(b);
+    if (role !== "user" && !cls && synth) {
+      const r = document.createElement("button");
+      r.type = "button";
+      r.className = "replay";
+      r.textContent = "🔊";
+      r.setAttribute("aria-label", "Read aloud");
+      r.onclick = () => { unlock(); speak(text, r); };
+      row.appendChild(r);
+    }
     chat.appendChild(row);
     chat.scrollTop = chat.scrollHeight;
     return row;
@@ -294,7 +380,7 @@
     addMsg("assistant", T[lang].hello);
   }
 
-  async function ask(text) {
+  async function ask(text, viaVoice = false) {
     text = text.trim();
     if (!text || busy) return;
     busy = true;
@@ -314,7 +400,8 @@
       typing.remove();
       if (!r.ok || !data.reply) throw new Error(data.error || r.status);
       history.push({ role: "assistant", content: data.reply });
-      addMsg("assistant", data.reply);
+      const row = addMsg("assistant", data.reply);
+      if (speakOn || viaVoice) speak(data.reply, row.querySelector(".replay"));
     } catch (e) {
       typing.remove();
       history.pop(); // let the user retry the same question
@@ -325,7 +412,8 @@
     }
   }
 
-  form.addEventListener("submit", (e) => { e.preventDefault(); ask(input.value); });
+  form.addEventListener("submit", (e) => { e.preventDefault(); unlock(); ask(input.value); });
+  quick.addEventListener("click", unlock);
 
   document.querySelectorAll(".lang button").forEach((b) =>
     b.addEventListener("click", () => {
@@ -370,7 +458,7 @@
       input.placeholder = T[lang].placeholder;
       const text = (committed + " " + current).trim();
       committed = current = "";
-      if (text) ask(text);
+      if (text) ask(text, true); // asked by voice → answer by voice
       else if (Date.now() - pressedAt < 400) { // just a tap → show how it works
         input.placeholder = T[lang].holdHint;
         setTimeout(() => (input.placeholder = T[lang].placeholder), 2500);
@@ -385,6 +473,8 @@
 
     const press = (e) => {
       e.preventDefault();
+      unlock();
+      if (synth) synth.cancel(); // stop talking so Choi Choi doesn't hear itself
       if (holding || busy) return;
       holding = true;
       pressedAt = Date.now();
