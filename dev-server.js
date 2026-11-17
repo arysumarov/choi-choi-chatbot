@@ -17,12 +17,13 @@ if (fs.existsSync(envFile)) {
 }
 
 process.chdir(__dirname);
-const handler = require("./api/chat.js");
+const handlers = { chat: require("./api/chat.js"), tts: require("./api/tts.js") };
 const PORT = process.env.PORT || 3000;
 
 http
   .createServer((req, res) => {
-    if (req.url.startsWith("/api/chat")) {
+    const api = req.url.match(/^\/api\/(chat|tts)\b/);
+    if (api) {
       let raw = "";
       req.on("data", (c) => {
         raw += c;
@@ -34,7 +35,7 @@ http
         } catch {
           req.body = {};
         }
-        handler(req, res);
+        handlers[api[1]](req, res);
       });
       return;
     }

@@ -243,50 +243,86 @@
   const history = []; // {role, content} – kept only in this tab, never stored
   let busy = false;
 
-  // ---- Voice output (browser speechSynthesis – free, runs on the phone) ----
+  // ---- Voice output ----
+  // 1st choice: natural neural voice from /api/tts (Azure AI Speech).
+  // Fallback (no key / error / offline): the browser's built-in voice.
   const synth = window.speechSynthesis || null;
-  let speakOn = false, unlocked = false, voices = [];
+  const player = new Audio();
+  const canSpeak = true;
+  const audioCache = new Map(); // text → audio URL, so 🔊 replays don't cost anything
+  const SILENT = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
+  let speakOn = false, unlocked = false, voices = [], serverTTS = true, speakSeq = 0;
   try { speakOn = localStorage.getItem("cc-speak") === "1"; } catch {}
   const loadVoices = () => { voices = synth ? synth.getVoices() : []; };
   if (synth) { loadVoices(); synth.addEventListener?.("voiceschanged", loadVoices); }
 
-  function pickVoice(yue) {
-    const prefs = yue ? [/^zh[-_]HK/i, /^yue/i] : [/^en[-_]US/i, /^en[-_]GB/i, /^en/i];
-    for (const re of prefs) {
-      const v = voices.find((v) => re.test(v.lang));
-      if (v) return v;
-    }
-    return null;
-  }
-
-  // iOS only allows speech that starts inside a tap, so "unlock" it on the first tap.
+  // iPhones only allow sound that starts inside a tap, so "unlock" audio on the first tap.
   function unlock() {
-    if (!synth || unlocked) return;
-    const u = new SpeechSynthesisUtterance(" ");
-    u.volume = 0;
-    synth.speak(u);
+    if (unlocked) return;
     unlocked = true;
+    try { player.src = SILENT; player.play().catch(() => {}); } catch {}
+    if (synth) { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; synth.speak(u); }
   }
 
-  function speak(text, btn) {
-    if (!synth) return;
-    synth.cancel();
-    document.querySelectorAll(".replay.playing").forEach((b) => b.classList.remove("playing"));
+  const clearPlaying = () => document.querySelectorAll(".replay.playing").forEach((b) => b.classList.remove("playing"));
+  function stopSpeaking() {
+    speakSeq++;
+    try { player.pause(); } catch {}
+    if (synth) synth.cancel();
+    clearPlaying();
+  }
+
+  async function speak(text, btn) {
+    stopSpeaking();
+    const my = ++speakSeq;
+    if (btn) btn.classList.add("playing");
+    if (serverTTS) {
+      try {
+        let url = audioCache.get(text);
+        if (!url) {
+          const r = await fetch("/api/tts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text }),
+          });
+          if (r.status === 501) serverTTS = false; // no Azure key yet → browser voice from now on
+          if (!r.ok) throw new Error("tts " + r.status);
+          url = URL.createObjectURL(await r.blob());
+          audioCache.set(text, url);
+        }
+        if (my !== speakSeq) return; // something else started meanwhile
+        player.src = url;
+        player.onended = clearPlaying;
+        await player.play();
+        return;
+      } catch {
+        if (my !== speakSeq) return;
+      }
+    }
+    speakBrowser(text, btn);
+  }
+
+  // Fallback: built-in voice. Prefer the nicer "natural/online/enhanced" voices where the device has them.
+  function pickVoice(yue) {
+    const langRe = yue ? /^(zh[-_]HK|yue)/i : /^en[-_](US|GB)/i;
+    const list = voices.filter((v) => langRe.test(v.lang));
+    const nice = /natural|neural|online|enhanced|premium|siri|google/i;
+    return list.find((v) => nice.test(v.name)) || list[0] || null;
+  }
+  function speakBrowser(text, btn) {
+    if (!synth) { clearPlaying(); return; }
     const yue = /[\u3400-\u9fff]/.test(text);
     const voice = pickVoice(yue);
-    const clean = text
-      .replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}]/gu, "")
-      .replace(/[~～]/g, " ");
-    // Speak sentence by sentence (Chrome cuts off long utterances).
+    const clean = text.replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}]/gu, "").replace(/[~～]/g, " ");
+    // Sentence by sentence (Chrome cuts off long utterances).
     const parts = (clean.match(/[^。！？!?\n]+[。！？!?]*/g) || []).map((p) => p.trim()).filter(Boolean);
     parts.forEach((p, i) => {
       const u = new SpeechSynthesisUtterance(p);
       u.lang = voice ? voice.lang : yue ? "zh-HK" : "en-US";
       if (voice) u.voice = voice;
       u.rate = 1;
-      u.pitch = 1.15; // a bit higher – it's a little cabbage
-      if (btn && i === 0) u.onstart = () => btn.classList.add("playing");
-      if (btn && i === parts.length - 1) u.onend = () => btn.classList.remove("playing");
+      u.pitch = 1.05;
+      if (btn && i === parts.length - 1) u.onend = clearPlaying;
       synth.speak(u);
     });
   }
@@ -296,14 +332,14 @@
     spkBtn.textContent = speakOn ? "🔊" : "🔇";
     spkBtn.setAttribute("aria-pressed", speakOn);
   }
-  if (synth) {
+  if (canSpeak) {
     spkBtn.hidden = false;
     showSpeak();
     spkBtn.addEventListener("click", () => {
       unlock();
       speakOn = !speakOn;
       try { localStorage.setItem("cc-speak", speakOn ? "1" : "0"); } catch {}
-      if (!speakOn) synth.cancel();
+      if (!speakOn) stopSpeaking();
       showSpeak();
     });
   }
@@ -342,7 +378,7 @@
     if (cls === "typing") b.innerHTML = "<span></span><span></span><span></span>";
     else b.textContent = text;
     row.appendChild(b);
-    if (role !== "user" && !cls && synth) {
+    if (role !== "user" && !cls && canSpeak) {
       const r = document.createElement("button");
       r.type = "button";
       r.className = "replay";
@@ -433,7 +469,7 @@
     function begin() {
       if (busy) return;
       unlock();
-      if (synth) synth.cancel(); // stop talking so Choi Choi doesn't hear itself
+      stopSpeaking(); // stop talking so Choi Choi doesn't hear itself
       recording = true;
       committed = current = "";
       input.value = "";
