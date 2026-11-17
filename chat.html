@@ -154,8 +154,11 @@
     cursor: pointer;
     font-size: 20px;
   }
-  #mic { background: #eef5e4; color: var(--green-dark); }
-  #mic.listening { background: #e5533d; color: #fff; animation: pulse 1s infinite; }
+  #mic {
+    background: #eef5e4; color: var(--green-dark);
+    touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  }
+  #mic.listening { background: #e5533d; color: #fff; animation: pulse 1s infinite; transform: scale(1.15); }
   @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(229,83,61,.5); } 50% { box-shadow: 0 0 0 8px rgba(229,83,61,0); } }
   #send { background: var(--green); color: #fff; }
   #send:disabled { opacity: .5; cursor: default; }
@@ -181,7 +184,7 @@
   <div id="quick"></div>
 
   <form id="form" autocomplete="off">
-    <button type="button" id="mic" class="icon-btn" aria-label="Voice input" hidden>🎤</button>
+    <button type="button" id="mic" class="icon-btn" aria-label="Hold to talk" hidden>🎤</button>
     <input id="input" type="text" maxlength="500" enterkeyhint="send">
     <button type="submit" id="send" class="icon-btn" aria-label="Send">➤</button>
   </form>
@@ -216,20 +219,24 @@
       subtitle: "Your cabbage friend at the Central Farmers' Market",
       placeholder: "Ask Choi Choi anything…",
       note: "Choi Choi is a cabbage, not an expert 🥬 Please don't share personal details.",
-      hello: "Hi! I'm Choi Choi 菜菜, a little cabbage from a Hong Kong organic farm 🥬\nAsk me about the market, the farmers, or local farming. You can type or tap 🎤 to talk!",
+      hello: "Hi! I'm Choi Choi 菜菜, a little cabbage from a Hong Kong organic farm 🥬\nAsk me about the market, the farmers, or local farming. You can type, or hold 🎤 and talk!",
       quick: ["What's in season?", "Meet the farmers", "Why is organic more expensive?", "When is the market open?", "What's HKORC certified?", "KFBG events"],
       error: "Oops, my leaves got tangled 🥬 Please try again in a moment!",
       noMic: "Sorry, voice input doesn't work in this browser. Please type instead!",
+      listening: "Listening… let go to send",
+      holdHint: "Hold 🎤 while you talk, let go to send",
       mic: "en-US",
     },
     yue: {
       subtitle: "中環農墟嘅椰菜朋友",
       placeholder: "問吓菜菜啦…",
       note: "菜菜係一棵椰菜，唔係專家 🥬 請唔好分享個人資料。",
-      hello: "你好！我係菜菜，一棵嚟自香港有機農場嘅小椰菜 🥬\n你可以問我關於農墟、農夫或者本地耕種嘅嘢。打字或者撳 🎤 講嘢都得！",
+      hello: "你好！我係菜菜，一棵嚟自香港有機農場嘅小椰菜 🥬\n你可以問我關於農墟、農夫或者本地耕種嘅嘢。打字或者㩒住 🎤 講嘢都得！",
       quick: ["而家有咩時令菜？", "認識吓啲農夫", "點解有機菜貴啲？", "農墟幾點開？", "咩係 HKORC 認證？", "嘉道理有咩活動？"],
       error: "哎呀，我啲葉打晒結 🥬 請遲啲再試吓！",
       noMic: "唔好意思，呢個瀏覽器用唔到語音輸入，請打字啦！",
+      listening: "聽緊…放手就會發送",
+      holdHint: "㩒住 🎤 講嘢，放手就會發送",
       mic: "zh-HK",
     },
   };
@@ -330,38 +337,78 @@
     })
   );
 
-  // Voice input (Web Speech API). Works in Chrome, Edge and iOS/macOS Safari.
+  // Voice input (Web Speech API), hold-to-talk: press and hold 🎤, let go to send.
+  // Works in Chrome, Edge and iOS/macOS Safari.
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let recog = null, listening = false;
+  let recog = null, listening = false, holding = false, committed = "", current = "", pressedAt = 0;
   if (SR) {
     recog = new SR();
     recog.interimResults = true;
-    recog.continuous = false;
+    recog.continuous = true; // keep listening for as long as the button is held
     recog.maxAlternatives = 1;
     micBtn.hidden = false;
+
+    const startRec = () => {
+      recog.lang = T[lang].mic;
+      try { recog.start(); listening = true; } catch {}
+    };
+
     recog.onresult = (e) => {
-      let txt = "";
-      for (const r of e.results) txt += r[0].transcript;
-      input.value = txt;
-      if (e.results[e.results.length - 1].isFinal) {
-        recog.stop();
-        ask(txt);
+      current = "";
+      for (const r of e.results) current += r[0].transcript;
+      input.value = (committed + " " + current).trim();
+    };
+    recog.onend = () => {
+      listening = false;
+      if (holding) { // browser stopped by itself (e.g. silence) while still held → keep going
+        committed = (committed + " " + current).trim();
+        current = "";
+        startRec();
+        return;
+      }
+      micBtn.classList.remove("listening");
+      input.placeholder = T[lang].placeholder;
+      const text = (committed + " " + current).trim();
+      committed = current = "";
+      if (text) ask(text);
+      else if (Date.now() - pressedAt < 400) { // just a tap → show how it works
+        input.placeholder = T[lang].holdHint;
+        setTimeout(() => (input.placeholder = T[lang].placeholder), 2500);
       }
     };
-    recog.onend = () => { listening = false; micBtn.classList.remove("listening"); };
     recog.onerror = (e) => {
-      if (e.error === "not-allowed" || e.error === "service-not-allowed") addMsg("assistant", T[lang].noMic, "error");
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+        holding = false;
+        addMsg("assistant", T[lang].noMic, "error");
+      }
     };
-    micBtn.addEventListener("click", () => {
-      if (listening) { recog.stop(); return; }
-      recog.lang = T[lang].mic;
-      try {
-        recog.start();
-        listening = true;
-        micBtn.classList.add("listening");
-      } catch {}
-    });
+
+    const press = (e) => {
+      e.preventDefault();
+      if (holding || busy) return;
+      holding = true;
+      pressedAt = Date.now();
+      committed = current = "";
+      input.value = "";
+      input.placeholder = T[lang].listening;
+      micBtn.classList.add("listening");
+      if (e.pointerId !== undefined) { try { micBtn.setPointerCapture(e.pointerId); } catch {} }
+      if (!listening) startRec();
+    };
+    const release = () => {
+      if (!holding) return;
+      holding = false;
+      try { recog.stop(); } catch {}
+    };
+
+    micBtn.addEventListener("pointerdown", press);
+    micBtn.addEventListener("pointerup", release);
+    micBtn.addEventListener("pointercancel", release);
+    micBtn.addEventListener("contextmenu", (e) => e.preventDefault()); // no long-press menu on phones
+    micBtn.addEventListener("keydown", (e) => { if ((e.key === " " || e.key === "Enter") && !e.repeat) press(e); });
+    micBtn.addEventListener("keyup", (e) => { if (e.key === " " || e.key === "Enter") release(); });
   }
+
 
   applyLang();
   showHello();
