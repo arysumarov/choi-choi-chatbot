@@ -37,7 +37,7 @@ Made from KFBG website pages (checked 8 Nov 2026):
 - `05_kfbg_upcoming_events.md` – events from Nov 2026 (note: KFBG Countryside Eco-festival is 21–22 Nov 2026, the same weekend as our showcase)
 - `06_kfbg_farming_courses_and_shop.md` – courses, fun facts (HK tea, coffee, honey), souvenirs
 - `07_fieldwork_interviews.md` – team interviews of 21 Sep 2026: Andrew (Pig Kun Farm), Rose (Blue Girl), a Kam Tin farming couple, 2 anonymous customers; farmers' seasonal guide and reasons organic costs more. Customers' health claims deliberately left out.
-- `08_vegetable_stories_trivia.md` – team's 10-vegetable guide: fun trivia + history stories (choy sum, kai-lan, watercress, tomato, pumpkin, bitter melon, daikon, okra, spinach, red onion). Legends marked "it's said"; a few facts corrected (Popeye decimal myth, kai-lan not broccoli's ancestor, CDC watercress study).
+- `08_vegetable_stories_trivia.md` – Content Research 4B story database (Choi Choi first-person veggie voice, HK Cantonese + English): fun trivia + history stories (choy sum, kai-lan, watercress, tomato, pumpkin, bitter melon, daikon, okra, spinach, red onion). Legends marked "it's said"; a few facts corrected (Popeye decimal myth, kai-lan not broccoli's ancestor, CDC watercress study).
 - `09_vegetable_nutrition_recipes.md` – team's nutrition notes (elder-friendly) + 2 home recipes each for 10 vegetables. Medical wording softened; Choi Choi may share general nutrition facts but never prevent/cure claims.
 
 **Still missing:** stall locations, stories from the other 6 farms, the Kam Tin couple's farm name.
